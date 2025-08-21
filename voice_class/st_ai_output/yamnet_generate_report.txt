@@ -1,0 +1,114 @@
+ST Edge AI Core v2.0.0-20049
+Created date          : 2025-08-20 11:58:22
+Parameters            : generate --model yamnet_256_64x96_tl_int8.tflite --target stm32n6 --st-neural-art default@user_neuralart_STM32N6570-DK.json --input-data-type uint8 --output-data-type float32 --inputs-ch-position chlast --name yamnet
+
+Model name - yamnet_256_64x96_tl_int8
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+m_id   layer (original)                    oshape                  param/size             macc                     connected to 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+0      serving_default_input_10 ()         [b:1,h:64,w:96,c:1]                                                                  
+       transpose_0 (TRANSPOSE)             [b:1,h:96,w:64,c:1]                           3,072         serving_default_input_10 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+1      conv2d_1 (CONV_2D)                  [b:1,h:48,w:32,c:32]    320/416             442,400                      transpose_0 
+       nl_1_nl (CONV_2D)                   [b:1,h:48,w:32,c:32]                         49,152                         conv2d_1 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+2      conv2d_2 (DEPTHWISE_CONV_2D)        [b:1,h:48,w:32,c:32]    320/416             442,400                          nl_1_nl 
+       nl_2_nl (DEPTHWISE_CONV_2D)         [b:1,h:48,w:32,c:32]                         49,152                         conv2d_2 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+3      conv2d_3 (CONV_2D)                  [b:1,h:48,w:32,c:64]    2,112/2,304       3,145,792                          nl_2_nl 
+       nl_3_nl (CONV_2D)                   [b:1,h:48,w:32,c:64]                         98,304                         conv2d_3 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+4      conv2d_4 (DEPTHWISE_CONV_2D)        [b:1,h:24,w:16,c:64]    640/832             221,248                          nl_3_nl 
+       nl_4_nl (DEPTHWISE_CONV_2D)         [b:1,h:24,w:16,c:64]                         24,576                         conv2d_4 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+5      conv2d_5 (CONV_2D)                  [b:1,h:24,w:16,c:128]   8,320/8,704       3,145,856                          nl_4_nl 
+       nl_5_nl (CONV_2D)                   [b:1,h:24,w:16,c:128]                        49,152                         conv2d_5 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+6      conv2d_6 (DEPTHWISE_CONV_2D)        [b:1,h:24,w:16,c:128]   1,280/1,664         442,496                          nl_5_nl 
+       nl_6_nl (DEPTHWISE_CONV_2D)         [b:1,h:24,w:16,c:128]                        49,152                         conv2d_6 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+7      conv2d_7 (CONV_2D)                  [b:1,h:24,w:16,c:128]   16,512/16,896     6,291,584                          nl_6_nl 
+       nl_7_nl (CONV_2D)                   [b:1,h:24,w:16,c:128]                        49,152                         conv2d_7 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+8      conv2d_8 (DEPTHWISE_CONV_2D)        [b:1,h:12,w:8,c:128]    1,280/1,664         110,720                          nl_7_nl 
+       nl_8_nl (DEPTHWISE_CONV_2D)         [b:1,h:12,w:8,c:128]                         12,288                         conv2d_8 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+9      conv2d_9 (CONV_2D)                  [b:1,h:12,w:8,c:256]    33,024/33,792     3,145,984                          nl_8_nl 
+       nl_9_nl (CONV_2D)                   [b:1,h:12,w:8,c:256]                         24,576                         conv2d_9 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+10     conv2d_10 (DEPTHWISE_CONV_2D)       [b:1,h:12,w:8,c:256]    2,560/3,328         221,440                          nl_9_nl 
+       nl_10_nl (DEPTHWISE_CONV_2D)        [b:1,h:12,w:8,c:256]                         24,576                        conv2d_10 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+11     conv2d_11 (CONV_2D)                 [b:1,h:12,w:8,c:256]    65,792/66,560     6,291,712                         nl_10_nl 
+       nl_11_nl (CONV_2D)                  [b:1,h:12,w:8,c:256]                         24,576                        conv2d_11 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+12     pool_12 (MEAN)                      [b:1,h:1,w:1,c:256]                          24,576                         nl_11_nl 
+       reshape_12_reshape (MEAN)           [b:1,c:256]                                                                  pool_12 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+13     model_1_new_head_MatMul ()          [b:10,c:256]            2,560/2,560                                                  
+       model_1_new_head_B..VariableOp ()   [b:10]                  10/40                                                        
+       gemm_13 (FULLY_CONNECTED)           [b:1,c:10]                                    2,570               reshape_12_reshape 
+                                                                                                        model_1_new_head_MatMul 
+                                                                                                 model_1_new_head_B..VariableOp 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+14     nl_14 (SOFTMAX)                     [b:1,c:10]                                      150                          gemm_13 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+15     conversion_15 (DEQUANTIZE)          [b:1,c:10]                                       20                            nl_14 
+------ ----------------------------------- ----------------------- --------------- ----------- -------------------------------- 
+model: macc=24,386,676 weights=139,176 activations=-- io=--
+
+
+
+
+
+Compilation details
+------------------------------------------------------------------------------------
+Compiler version: 0.0.0-0000
+Compiler arguments:  -i C:\Users\langzi\Desktop\learn_stm32\Model-zoo\Edge_ai_DIY\voice_class\st_ai_output\yamnet_256_64x96_tl_int8_OE_3_1_0.onnx --json-quant-file C:\Users\langzi\Desktop\learn_stm32\Model-zoo\Edge_ai_DIY\voice_class\st_ai_output\yamnet_256_64x96_tl_int8_OE_3_1_0_Q.json -g yamnet.c --load-mdesc C:\ST\STEdgeAI\2.0\Utilities\configs\stm32n6.mdesc --load-mpool C:\Users\langzi\Desktop\learn_stm32\Model-zoo\Edge_ai_DIY\voice_class\my_mpools\stm32n6-app2_STM32N6570-DK.mpool --save-mpool-file C:\Users\langzi\Desktop\learn_stm32\Model-zoo\Edge_ai_DIY\voice_class\st_ai_ws\neural_art__yamnet\stm32n6-app2_STM32N6570-DK.mpool --out-dir-prefix C:\Users\langzi\Desktop\learn_stm32\Model-zoo\Edge_ai_DIY\voice_class\st_ai_ws\neural_art__yamnet/ -O3 --all-buffers-info --mvei --cache-maintenance --Oalt-sched --native-float --enable-virtual-mem-pools --Omax-ca-pipe 4 --Ocache-opt --Os --enable-epoch-controller --output-info-file c_info.json --network-name yamnet
+====================================================================================
+
+Memory usage information
+------------------------------------------------------------------------------------
+	flexMEM    [0x34000000 - 0x34000000]:          0  B /          0  B  (  0.00 % used) -- weights:          0  B (  0.00 % used)  activations:          0  B (  0.00 % used)
+	cpuRAM1    [0x34080000 - 0x34080000]:          0  B /          0  B  (  0.00 % used) -- weights:          0  B (  0.00 % used)  activations:          0  B (  0.00 % used)
+	cpuRAM2    [0x34100000 - 0x34200000]:          0  B /      1.000 MB  (  0.00 % used) -- weights:          0  B (  0.00 % used)  activations:          0  B (  0.00 % used)
+	npuRAM3    [0x34200000 - 0x34270000]:          0  B /    448.000 kB  (  0.00 % used) -- weights:          0  B (  0.00 % used)  activations:          0  B (  0.00 % used)
+	npuRAM4    [0x34270000 - 0x342E0000]:          0  B /    448.000 kB  (  0.00 % used) -- weights:          0  B (  0.00 % used)  activations:          0  B (  0.00 % used)
+	npuRAM5    [0x342E0000 - 0x34350000]:    144.000 kB /    448.000 kB  ( 32.14 % used) -- weights:          0  B (  0.00 % used)  activations:    144.000 kB ( 32.14 % used)
+	npuRAM6    [0x34350000 - 0x343BFFF8]:          0  B /    447.992 kB  (  0.00 % used) -- weights:          0  B (  0.00 % used)  activations:          0  B (  0.00 % used)
+	octoFlash  [0x70380000 - 0x7077FFF8]:    176.610 kB /      4.000 MB  (  4.31 % used) -- weights:    176.610 kB (  4.31 % used)  activations:          0  B (  0.00 % used)
+	hyperRAM   [0x90000000 - 0x903FFFF8]:          0  B /      4.000 MB  (  0.00 % used) -- weights:          0  B (  0.00 % used)  activations:          0  B (  0.00 % used)
+---
+Total:                                           320.610 kB                                  -- weights:    176.610 kB                  activations:    144.000 kB                   
+====================================================================================
+
+
+Used memory ranges
+------------------------------------------------------------------------------------
+	npuRAM5    [0x342E0000 - 0x34350000]: 0x342E0000-0x34304000
+	octoFlash  [0x70380000 - 0x7077FFF8]: 0x70380000-0x703AC280
+====================================================================================
+
+Epochs details
+------------------------------------------------------------------------------------
+Total number of epochs: 17 of which 2 implemented in software
+---
+epoch ID   HW/SW/EC Operation (SW only)
+epoch 1       EC    
+epoch 2       EC    
+epoch 3       EC    
+epoch 4       EC    
+epoch 5       EC    
+epoch 6       EC    
+epoch 7       EC    
+epoch 8       EC    
+epoch 9       EC    
+epoch 10      EC    
+epoch 11      EC    
+epoch 12      EC    
+epoch 13      EC    
+epoch 14      EC    
+epoch 15      EC    
+epoch 16     -SW-   (      Softmax       )
+epoch 17     -SW-   (  DequantizeLinear  )
+====================================================================================
